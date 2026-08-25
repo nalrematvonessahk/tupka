@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Тупка — карточная игра онлайн</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="screen-home" class="screen">
+  <div class="home-wrap">
+    <div class="brand">
+      <span class="brand-suit">♠</span>
+      <h1>Тупка</h1>
+      <span class="brand-suit brand-suit--red">♥</span>
+    </div>
+    <p class="tagline">Козырь всегда червы. Пику бьёт только пика. Не подкидывай после дамы.</p>
+
+    <div class="card-panel">
+      <label class="field">
+        <span>Ваше имя</span>
+        <input id="input-name" type="text" maxlength="20" placeholder="Например, Аружан" autocomplete="off">
+      </label>
+
+      <div class="panel-actions">
+        <button id="btn-create" class="btn btn--primary">Создать комнату</button>
+        <div class="divider"><span>или</span></div>
+        <label class="field">
+          <span>Код комнаты</span>
+          <input id="input-code" type="text" maxlength="4" placeholder="A1B2" autocomplete="off" style="text-transform:uppercase; letter-spacing:.25em; text-align:center; font-weight:700;">
+        </label>
+        <button id="btn-join" class="btn btn--ghost">Войти в комнату</button>
+      </div>
+      <p id="home-error" class="error-text"></p>
+    </div>
+  </div>
+</div>
+
+<div id="screen-lobby" class="screen" hidden>
+  <div class="lobby-wrap">
+    <div class="lobby-code">
+      <span>Код комнаты</span>
+      <strong id="lobby-code-text">— — — —</strong>
+      <button id="btn-copy" class="btn-copy" title="Скопировать код">Скопировать</button>
+    </div>
+    <h2>Игроки в комнате</h2>
+    <ul id="lobby-players" class="lobby-players"></ul>
+    <p class="lobby-hint">Нужно минимум 2 игрока (максимум 6). Раздача — по 6 карт каждому, козырь черви.</p>
+    <button id="btn-start" class="btn btn--primary">Начать игру</button>
+    <p id="lobby-error" class="error-text"></p>
+  </div>
+</div>
+
+<div id="screen-game" class="screen" hidden>
+  <header class="game-header">
+    <div class="hdr-item">
+      <span class="hdr-label">Комната</span>
+      <strong id="hdr-room">—</strong>
+    </div>
+    <div class="hdr-item hdr-item--trump">
+      <span class="hdr-label">Козырь</span>
+      <strong class="trump-badge">♥ Черви</strong>
+    </div>
+    <div class="hdr-item">
+      <span class="hdr-label">В колоде</span>
+      <strong id="hdr-deck">36</strong>
+    </div>
+    <div class="hdr-item hdr-item--status">
+      <span id="hdr-status">Ожидание игроков…</span>
+    </div>
+  </header>
+
+  <div class="opponents" id="opponents"></div>
+
+  <main class="table-area">
+    <div id="table-cards" class="table-cards"></div>
+    <div id="penalty-banner" class="penalty-banner" hidden></div>
+  </main>
+
+  <div class="log-panel" id="log-panel"></div>
+
+  <footer class="hand-area">
+    <div class="hand-actions" id="hand-actions"></div>
+    <div class="hand-cards" id="hand-cards"></div>
+  </footer>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+<div id="gameover-modal" class="modal" hidden>
+  <div class="modal-card">
+    <h2 id="gameover-title">Игра окончена</h2>
+    <p id="gameover-text"></p>
+    <button class="btn btn--primary" onclick="location.reload()">Новая игра</button>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="client.js"></script>
+</body>
+</html>
