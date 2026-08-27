@@ -13,6 +13,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const rooms = new Map(); // code -> Game
 
+// Разрешённый набор реакций-эмодзи: 25 штук, картинки лежат в
+// public/emoji/1.png … 25.png. Валидируем ID на сервере, чтобы никто не
+// отправлял произвольный текст под видом «эмодзи». Чтобы заменить картинки
+// на свои — просто подмените файлы в public/emoji/ с теми же именами
+// (1.png … 25.png), код трогать не нужно.
+const EMOJI_COUNT = 25;
+const ALLOWED_EMOJI_IDS = new Set(
+  Array.from({ length: EMOJI_COUNT }, (_, i) => String(i + 1))
+);
+
 function genCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code;
@@ -37,7 +47,7 @@ io.on('connection', (socket) => {
     try {
       const code = genCode();
       const game = new Game(code);
-      game.addPlayer(socket.id, (name || 'Игрок').trim().slice(0, 20));
+      game.addPlayer(socket.id, (name || 'Игрок').trim().slice(0, 30));
       rooms.set(code, game);
       currentRoom = code;
       socket.join(code);
@@ -53,7 +63,7 @@ io.on('connection', (socket) => {
       const code = (roomCode || '').trim().toUpperCase();
       const game = rooms.get(code);
       if (!game) return cb({ ok: false, error: 'Комната не найдена' });
-      game.addPlayer(socket.id, (name || 'Игрок').trim().slice(0, 20));
+      game.addPlayer(socket.id, (name || 'Игрок').trim().slice(0, 30));
       currentRoom = code;
       socket.join(code);
       cb({ ok: true, roomCode: code });
@@ -137,6 +147,20 @@ io.on('connection', (socket) => {
     const res = game.callOutLowCards(socket.id, targetId);
     cb && cb(res);
     broadcastState(currentRoom);
+  });
+
+  // Эмодзи-реакции — не часть игрового состояния, просто моментальная
+  // рассылка всем в комнате. Ограничиваем частоту, чтобы не заспамили.
+  let lastEmojiAt = 0;
+  socket.on('sendEmoji', ({ emojiId }) => {
+    if (!currentRoom) return;
+    const game = rooms.get(currentRoom);
+    if (!game || !game.getPlayer(socket.id)) return;
+    if (!ALLOWED_EMOJI_IDS.has(emojiId)) return;
+    const now = Date.now();
+    if (now - lastEmojiAt < 600) return; // не чаще ~1.6 раза в секунду
+    lastEmojiAt = now;
+    io.to(currentRoom).emit('emojiReaction', { playerId: socket.id, emojiId });
   });
 
   socket.on('disconnect', () => {

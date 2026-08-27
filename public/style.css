@@ -136,6 +136,22 @@ h1, h2 { font-family: 'Fraunces', serif; margin: 0; }
 .log-panel div { padding: 1px 0; }
 
 .hand-area { background: rgba(0,0,0,.32); border-top: 1px solid rgba(201,162,75,.3); padding: 14px 16px 20px; }
+
+.hand-toolbar { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; position: relative; }
+.self-marker {
+  display: flex; align-items: center; gap: 6px; background: rgba(201,162,75,.15);
+  border: 1px solid rgba(201,162,75,.4); border-radius: 20px; padding: 5px 14px;
+  font-size: .8rem; font-weight: 700; color: var(--brass-soft); position: relative;
+}
+.btn-emoji {
+  width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(201,162,75,.4);
+  background: rgba(255,255,255,.06); cursor: pointer; display: flex; padding: 0;
+  align-items: center; justify-content: center; transition: transform .12s ease; overflow: hidden;
+}
+.btn-emoji img { width: 26px; height: 26px; object-fit: contain; object-position: center; }
+.btn-emoji:hover { transform: scale(1.08); background: rgba(255,255,255,.12); }
+.btn-emoji:active { transform: scale(.95); }
+
 .hand-actions { display: flex; gap: 10px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
 .hand-actions .btn { width: auto; padding: 10px 22px; }
 .hand-cards { display: flex; gap: -10px; justify-content: center; flex-wrap: wrap; min-height: 100px; }
@@ -179,4 +195,45 @@ h1, h2 { font-family: 'Fraunces', serif; margin: 0; }
   .card { width: 56px; height: 80px; }
   .card .suit-mid { font-size: 1.3rem; }
   .brand h1 { font-size: 2.2rem; }
+}
+
+/* ---------- EMOJI ---------- */
+.emoji-picker-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55); display: flex;
+  align-items: flex-end; justify-content: center; z-index: 70; padding-bottom: 110px;
+}
+.emoji-picker-overlay[hidden] { display: none; }
+.emoji-picker-card {
+  background: var(--cream); border-radius: 22px; padding: 22px 20px 18px; position: relative;
+  box-shadow: 0 12px 40px rgba(0,0,0,.45); animation: emojiPickerIn .18s ease;
+}
+@keyframes emojiPickerIn {
+  from { opacity: 0; transform: translateY(12px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.emoji-picker-close {
+  position: absolute; top: 10px; left: 10px; width: 26px; height: 26px; border-radius: 50%;
+  border: none; background: rgba(0,0,0,.08); color: var(--red); font-size: 1rem; font-weight: 700;
+  cursor: pointer; line-height: 1; display: flex; align-items: center; justify-content: center;
+}
+.emoji-grid { display: grid; grid-template-columns: repeat(5, 56px); gap: 10px; margin-top: 18px; }
+.emoji-grid img {
+  width: 44px; height: 44px; cursor: pointer; transition: transform .1s ease; border-radius: 8px;
+  object-fit: contain; object-position: center;
+}
+.emoji-grid img:hover { transform: scale(1.18); }
+.emoji-grid img:active { transform: scale(.95); }
+
+.emoji-bubble {
+  position: fixed; width: 52px; height: 52px; border-radius: 50%; background: var(--cream);
+  border: 2px solid var(--brass); box-shadow: var(--shadow-card); display: flex; align-items: center;
+  justify-content: center; pointer-events: none; z-index: 80; transform: translate(-50%, -100%);
+  animation: emojiFloat 2.2s ease forwards;
+}
+.emoji-bubble img { width: 38px; height: 38px; object-fit: contain; object-position: center; }
+@keyframes emojiFloat {
+  0%   { opacity: 0; transform: translate(-50%, -80%) scale(.4); }
+  15%  { opacity: 1; transform: translate(-50%, -115%) scale(1.15); }
+  75%  { opacity: 1; transform: translate(-50%, -145%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -175%) scale(.9); }
 }

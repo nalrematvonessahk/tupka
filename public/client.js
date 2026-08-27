@@ -4,6 +4,7 @@ const socket = io();
 const RANK_NAMES = { 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: 'В', 12: 'Д', 13: 'К', 14: 'Т' };
 const SUIT_SYMBOL = { H: '♥', D: '♦', C: '♣', S: '♠' };
 const RED_SUITS = ['H', 'D'];
+const EMOJI_COUNT = 25; // картинки лежат в /emoji/1.png … /emoji/25.png
 
 let myId = null;
 let selectedHandIdx = null;
@@ -77,6 +78,53 @@ $('#btn-start').addEventListener('click', () => {
   });
 });
 
+// ---------- Emoji ----------
+(function initEmojiPicker() {
+  const grid = $('#emoji-grid');
+  for (let i = 1; i <= EMOJI_COUNT; i++) {
+    const id = String(i);
+    const img = document.createElement('img');
+    img.src = `/emoji/${id}.png`;
+    img.alt = 'emoji';
+    img.dataset.id = id;
+    img.addEventListener('click', () => {
+      socket.emit('sendEmoji', { emojiId: id });
+      hide($('#emoji-picker'));
+    });
+    grid.appendChild(img);
+  }
+})();
+
+$('#btn-emoji').addEventListener('click', () => show($('#emoji-picker')));
+$('#emoji-picker-close').addEventListener('click', () => hide($('#emoji-picker')));
+$('#emoji-picker').addEventListener('click', (e) => {
+  if (e.target.id === 'emoji-picker') hide($('#emoji-picker'));
+});
+
+function findEmojiAnchor(playerId) {
+  if (lastState && playerId === lastState.me) return $('#self-marker');
+  return document.querySelector(`.opp-card[data-player-id="${playerId}"]`);
+}
+
+function showEmojiBubble(playerId, emojiId) {
+  const anchor = findEmojiAnchor(playerId);
+  if (!anchor) return;
+  const rect = anchor.getBoundingClientRect();
+  const bubble = document.createElement('div');
+  bubble.className = 'emoji-bubble';
+  bubble.style.left = (rect.left + rect.width / 2) + 'px';
+  bubble.style.top = rect.top + 'px';
+  const img = document.createElement('img');
+  img.src = `/emoji/${emojiId}.png`;
+  bubble.appendChild(img);
+  document.body.appendChild(bubble);
+  setTimeout(() => bubble.remove(), 2300);
+}
+
+socket.on('emojiReaction', ({ playerId, emojiId }) => {
+  showEmojiBubble(playerId, emojiId);
+});
+
 // ---------- Socket state ----------
 socket.on('connect', () => { myId = socket.id; });
 
@@ -125,6 +173,8 @@ function renderGame(state) {
   }
   $('#hdr-status').textContent = statusTxt;
 
+  if (me) $('#self-marker-name').textContent = `Вы: ${me.name}`;
+
   // opponents strip (all players except me, in seat order starting after me)
   const oppWrap = $('#opponents');
   oppWrap.innerHTML = '';
@@ -132,6 +182,7 @@ function renderGame(state) {
     if (p.id === state.me) return;
     const div = document.createElement('div');
     div.className = 'opp-card';
+    div.dataset.playerId = p.id;
     if (idx === state.defenderIdx) div.classList.add('is-defender');
     if (idx === state.attackerIdx) div.classList.add('is-attacker');
     if (!p.connected) div.classList.add('offline');

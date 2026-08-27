@@ -22,7 +22,7 @@
     <div class="card-panel">
       <label class="field">
         <span>Ваше имя</span>
-        <input id="input-name" type="text" maxlength="20" placeholder="Например, Любовь Всей Моей Жизни❤️" autocomplete="off">
+        <input id="input-name" type="text" maxlength="30" placeholder="Например, Любовь Всей Моей Жизни❤️" autocomplete="off">
       </label>
 
       <div class="panel-actions">
@@ -83,9 +83,22 @@
   <div class="log-panel" id="log-panel"></div>
 
   <footer class="hand-area">
+    <div class="hand-toolbar">
+      <div class="self-marker" id="self-marker">
+        <span class="self-marker-name" id="self-marker-name">Вы</span>
+      </div>
+      <button id="btn-emoji" class="btn-emoji" title="Отправить реакцию"><img src="/emoji/1.png" alt="Реакции"></button>
+    </div>
     <div class="hand-actions" id="hand-actions"></div>
     <div class="hand-cards" id="hand-cards"></div>
   </footer>
+</div>
+
+<div id="emoji-picker" class="emoji-picker-overlay" hidden>
+  <div class="emoji-picker-card">
+    <button class="emoji-picker-close" id="emoji-picker-close">&times;</button>
+    <div class="emoji-grid" id="emoji-grid"></div>
+  </div>
 </div>
 
 <div id="toast" class="toast" hidden></div>
